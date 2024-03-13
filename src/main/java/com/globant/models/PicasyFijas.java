@@ -1,12 +1,13 @@
 package com.globant.models;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 import java.util.*;
 
 @Data
 @Builder
+@Getter
+@NoArgsConstructor
 public class PicasyFijas {
 
     // Attributes
@@ -14,6 +15,26 @@ public class PicasyFijas {
     private final static byte[] guessNumber = new byte[numOfDigits];
     private final static Set<Byte> guessNumbers = new HashSet<>();
     private static int numTries = 0;
+    private static int bestScore = 0;
+    private static int picas;
+    private static int fijas;
+
+    // Getter
+    public byte getNumOfDigits(){
+        return numOfDigits;
+    }
+
+    public int getNumOfTries(){
+        return numTries;
+    }
+
+    public int getFijas() {
+        return fijas;
+    }
+
+    public int getPicas() {
+        return picas;
+    }
 
     // Methods
     private void createGuessNumber(){
@@ -34,13 +55,18 @@ public class PicasyFijas {
         numTries = 0;
         createGuessNumber();
     }
-    public int[] guessNumber(byte[] userGuess){
+    public boolean guessNumber(String userGuessString){
+        // System.out.println(Arrays.toString(guessNumber));
+
+        String[] userGuess = userGuessString.split("");
+        numTries++;
+
         Set<Byte> picas = new HashSet<>(); // numbers present
         Set<Byte> fijas = new HashSet<>(); //positions were it matches
 
         // find fijas
         for (byte i = 0; i < numOfDigits; i++){
-            if (userGuess[i] == guessNumber[i]){
+            if (Byte.parseByte(userGuess[i]) == guessNumber[i]){
                 fijas.add(i);
             }
         }
@@ -48,10 +74,20 @@ public class PicasyFijas {
         // find picas
         for (byte i = 0; i < numOfDigits; i++){
             if ((!fijas.contains(i)) &&
-                    (guessNumbers.contains(userGuess[i]))){
+                    (guessNumbers.contains(Byte.parseByte(userGuess[i])))){
                 picas.add(i);
             }
         }
-        return new int[]{picas.size(), fijas.size()};
+
+        // Set response
+        PicasyFijas.picas = picas.size();
+        PicasyFijas.fijas = fijas.size();
+
+        return isWinner();
     }
+
+    private boolean isWinner() {
+        return (fijas == numOfDigits);
+    }
+
 }
