@@ -49,6 +49,7 @@ public class PicasyFijas {
                 i++;
             }
         }
+        System.out.println(Arrays.toString(guessNumber));
     }
 
     public void beginGame(){
@@ -56,24 +57,25 @@ public class PicasyFijas {
         createGuessNumber();
     }
     public boolean guessNumber(String userGuessString){
-        // System.out.println(Arrays.toString(guessNumber));
 
         String[] userGuess = userGuessString.split("");
         numTries++;
 
         Set<Byte> picas = new HashSet<>(); // numbers present
         Set<Byte> fijas = new HashSet<>(); //positions were it matches
+        Set<String> fijasNum = new HashSet<>(); //positions were it matches
 
         // find fijas
         for (byte i = 0; i < numOfDigits; i++){
             if (Byte.parseByte(userGuess[i]) == guessNumber[i]){
                 fijas.add(i);
+                fijasNum.add(userGuess[i]);
             }
         }
 
         // find picas
         for (byte i = 0; i < numOfDigits; i++){
-            if ((!fijas.contains(i)) &&
+            if ((!fijasNum.contains(userGuess[i])) &&
                     (guessNumbers.contains(Byte.parseByte(userGuess[i])))){
                 picas.add(i);
             }

@@ -5,17 +5,18 @@ import com.globant.models.PicasyFijas;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.HashSet;
 import java.util.Scanner;
+import java.util.Set;
 
 public class GameInterface {
 
-    private static final Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger(GameInterface.class);
     private static final Scanner scanner = new Scanner(System.in);
     private static final PicasyFijas picasyFijas = new PicasyFijas();
 
     // Constructor
     public GameInterface(){
-        System.out.println("Aqui esta");
         logInfo("Bienvenido al juego Picas y Fijas");
         mainMenu();
     }
@@ -23,7 +24,6 @@ public class GameInterface {
     // Methods
     private static void mainMenu(){
         String option = "";
-        System.out.println("1");
         while (!option.equals("0")){
             logInfo("\n¿Deseas comenzar un nuevo juego?");
             logInfo("1. Si");
@@ -48,15 +48,20 @@ public class GameInterface {
             logInfo("\nIngresa el numero que crees que es o 0 para salir:");
 
             userGuess = scanner.nextLine();
-            if(userGuess.equals("0")){
-                exit = true;
+            try {
+                if(userGuess.equals("0")){
+                    exit = true;
+                }
+                else if (isValidGuess(userGuess)){
+                    winner = picasyFijas.guessNumber(userGuess);
+                    logInfo("\nPicas: "+picasyFijas.getPicas());
+                    logInfo("\nFijas: "+ picasyFijas.getFijas());
+                }
+            } catch (Exception e) {
+                logInfo("Ha sucedido un error con el juego");
+                // logInfo(e);
             }
-            else if (isValidGuess(userGuess)){
-                winner = picasyFijas.guessNumber(userGuess);
-                logInfo("\nPicas: "+picasyFijas.getPicas());
-                logInfo("\nFijas: "+ picasyFijas.getFijas());
-                // 5628
-            }
+            
         }
         if (winner){
             logInfo("\nFelicidades, ganaste!");
@@ -87,12 +92,27 @@ public class GameInterface {
     }
 
     public static boolean isValidGuess(final String integer){
-
         final boolean isInteger = integer.matches("(\\d)+");
+
+        // Check if it is valid lengh and integer values
         if ((isInteger) && (integer.length() == picasyFijas.getNumOfDigits())){
-            return true;
+            Set<Character> digits = new HashSet<>();
+            int i=0;
+            boolean notRepeated = true;
+            while ((i<integer.length()) && (notRepeated)) {
+                if(digits.contains(integer.charAt(i))) {
+                    notRepeated = false;
+                 }
+                digits.add(integer.charAt(i));
+                i++;
+            }
+            if (!notRepeated){
+                logInfo("\nNo se pueden ingresar digitos repetidos");
+            }
+            return notRepeated;
         }
-        System.out.println("\nNo se ingresó un numero valido");
+
+        logInfo("\nNo se ingresó un numero valido");
         return false;
     }
 }
